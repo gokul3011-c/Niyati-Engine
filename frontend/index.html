@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niyati Engine - AI Resume Screening</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="crystal crystal-1"></div>
+        <div class="crystal crystal-2"></div>
+        <div class="crystal crystal-3"></div>
+        <div class="crystal crystal-4"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h1>Niyati Engine</h1>
+            </div>
+            <p class="subtitle">AI-Powered Resume Screening System</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="input-panel glass-card">
+                <div class="panel-header">
+                    <i class="fas fa-upload"></i>
+                    <h2>Input Panel</h2>
+                </div>
+
+                <!-- File Upload -->
+                <div class="upload-zone" id="uploadZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop resumes here or click to browse</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.jpg,.jpeg,.png" hidden>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
+                <!-- Job Description -->
+                <div class="form-group">
+                    <label for="jobDescription">
+                        <i class="fas fa-briefcase"></i>
+                        Job Description
+                    </label>
+                    <textarea id="jobDescription" placeholder="Enter the job description here..." rows="6"></textarea>
+                </div>
+
+                <!-- Cutoff Score -->
+                <div class="form-group">
+                    <label for="cutoffSlider">
+                        <i class="fas fa-sliders-h"></i>
+                        Cutoff Score: <span id="cutoffValue">70</span>%
+                    </label>
+                    <input type="range" id="cutoffSlider" min="0" max="100" value="70">
+                </div>
+
+                <!-- Analyze Button -->
+                <button class="btn-analyze" id="analyzeBtn">
+                    <i class="fas fa-rocket"></i>
+                    Analyze Resumes
+                </button>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel" id="resultsPanel" style="display: none;">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card glass-card">
+                        <i class="fas fa-users"></i>
+                        <h3 id="totalCount">0</h3>
+                        <p>Total Candidates</p>
+                    </div>
+                    <div class="stat-card glass-card success">
+                        <i class="fas fa-check-circle"></i>
+                        <h3 id="acceptedCount">0</h3>
+                        <p>Accepted</p>
+                    </div>
+                    <div class="stat-card glass-card danger">
+                        <i class="fas fa-times-circle"></i>
+                        <h3 id="rejectedCount">0</h3>
+                        <p>Rejected</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-download" id="downloadBtn">
+                        <i class="fas fa-download"></i>
+                        Download Results
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="accepted">
+                        <i class="fas fa-check"></i>
+                        Accepted (<span id="acceptedTabCount">0</span>)
+                    </button>
+                    <button class="tab-btn" data-tab="rejected">
+                        <i class="fas fa-times"></i>
+                        Rejected (<span id="rejectedTabCount">0</span>)
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="acceptedPane">
+                        <div id="acceptedList" class="candidate-list"></div>
+                    </div>
+                    <div class="tab-pane" id="rejectedPane">
+                        <div id="rejectedList" class="candidate-list"></div>
+                    </div>
+                </div>
+
+                <!-- Analytics -->
+                <div class="analytics-section glass-card">
+                    <h3><i class="fas fa-chart-pie"></i> Analytics Dashboard</h3>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loader">
+            <div class="crystal-loader"></div>
+            <p>Analyzing Resumes...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
