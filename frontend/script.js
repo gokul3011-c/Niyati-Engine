@@ -692,13 +692,16 @@ function createCandidateCard(candidate, rank, isAccepted) {
         card.classList.add('top-match');
     }
     
-    // Handle both API response and direct result formats
-    const candidateName = candidate['Candidate Name'] || candidate.name;
-    const predictedRole = candidate['Predicted Role'] || candidate.role;
-    const finalScore = candidate['Final Score %'] || candidate.final_score;
-    const similarity = candidate['Similarity %'] || candidate.similarity;
-    const skillMatch = candidate['Skill Match %'] || candidate.skill_match;
-    const experience = candidate['Experience %'] || candidate.experience || 0;
+    // Handle both API response formats (analyze endpoint vs session endpoint)
+    const candidateName = candidate['Candidate Name'] || candidate.name || 'Unknown';
+    const predictedRole = candidate['Predicted Role'] || candidate.role || 'N/A';
+    
+    // Fix: Properly handle 0 values and undefined
+    const finalScore = candidate['Final Score %'] !== undefined ? candidate['Final Score %'] : (candidate.final_score || 0);
+    const similarity = candidate['Similarity %'] !== undefined ? candidate['Similarity %'] : (candidate.similarity || 0);
+    const skillMatch = candidate['Skill Match %'] !== undefined ? candidate['Skill Match %'] : (candidate.skill_match || 0);
+    const experience = candidate['Experience %'] !== undefined ? candidate['Experience %'] : (candidate.experience || 0);
+    
     const matchedSkills = candidate['Matched Skills'] || candidate.matched_skills || [];
     const missingSkills = candidate['Missing Skills'] || candidate.missing_skills || [];
     
