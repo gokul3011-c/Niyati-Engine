@@ -37,9 +37,3 @@ services:
       - key: FLASK_PORT
         value: 10000
 
-  # PostgreSQL Database
-  - type: postgres
-    name: niyati-db
-    databaseName: Niyati Engine
-    user: gokul3011-c
-    ipAllowList: []
