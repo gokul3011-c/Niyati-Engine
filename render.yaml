@@ -40,6 +40,6 @@ services:
   # PostgreSQL Database
   - type: pserv
     name: niyati-db
-    databaseName: niyati_engine
-    user: niyati_user
+    databaseName: Niyati Engine
+    user: gokul3011-c
     ipAllowList: []
