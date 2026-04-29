@@ -1,9 +1,8 @@
 services:
-  # 🔥 Flask Backend
+  # 🔥 Web Service (Flask)
   - type: web
     name: niyati-engine
     env: python
-    region: oregon
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn wsgi:app
@@ -17,16 +16,7 @@ services:
           name: niyati-db
           property: connectionString
 
-      - key: FLASK_SECRET_KEY
-        generateValue: true
-
-      - key: FLASK_DEBUG
-        value: false
-
-      - key: FLASK_PORT
-        value: 10000
-
-  # 🔥 PostgreSQL DB
+  # 🔥 PostgreSQL (Render managed)
   - type: pserv
     name: niyati-db
     plan: free
