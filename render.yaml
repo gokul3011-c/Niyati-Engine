@@ -1,5 +1,5 @@
 services:
-  # Web Service - Flask Backend
+  # 🔥 Flask Backend
   - type: web
     name: niyati-engine
     env: python
@@ -14,7 +14,8 @@ services:
 
       - key: DATABASE_URL
         fromDatabase:
-          name: Niyati Engine   # matches your current DB name
+          name: niyati-db
+          property: connectionString
 
       - key: FLASK_SECRET_KEY
         generateValue: true
@@ -24,3 +25,8 @@ services:
 
       - key: FLASK_PORT
         value: 10000
+
+  # 🔥 PostgreSQL DB
+  - type: pserv
+    name: niyati-db
+    plan: free
