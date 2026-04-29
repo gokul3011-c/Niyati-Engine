@@ -28,6 +28,98 @@ with app.app_context():
     except Exception as e:
         print(f"⚠️  Database initialization skipped: {e}")
 
+# ------------------- AUTO MIGRATION ENDPOINT -------------------
+@app.route('/api/migrate', methods=['GET'])
+def run_migration():
+    """Run database migration to add missing columns"""
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        migrations_done = []
+        
+        # Add missing columns to users table
+        user_columns = [
+            ('company', 'VARCHAR(200)'),
+            ('email', 'VARCHAR(150)'),
+            ('last_login', 'TIMESTAMP'),
+            ('is_active', 'BOOLEAN DEFAULT TRUE')
+        ]
+        
+        for col_name, col_type in user_columns:
+            cursor.execute("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = 'users' AND column_name = %s
+            """, (col_name,))
+            
+            if not cursor.fetchone():
+                cursor.execute(f"""
+                    ALTER TABLE users 
+                    ADD COLUMN {col_name} {col_type}
+                """)
+                conn.commit()
+                migrations_done.append(f"Added '{col_name}' to users table")
+        
+        # Add missing columns to candidates table
+        cursor.execute("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = 'candidates' AND column_name = 'session_id'
+        """)
+        
+        if not cursor.fetchone():
+            cursor.execute("""
+                ALTER TABLE candidates 
+                ADD COLUMN session_id INTEGER REFERENCES analysis_sessions(id)
+            """)
+            conn.commit()
+            migrations_done.append("Added 'session_id' to candidates table")
+        
+        candidate_columns = [
+            ('matched_skills', 'TEXT[]'),
+            ('missing_skills', 'TEXT[]'),
+            ('job_description', 'TEXT'),
+            ('cutoff_score', 'DECIMAL(5, 2)'),
+            ('status', 'VARCHAR(20)')
+        ]
+        
+        for col_name, col_type in candidate_columns:
+            cursor.execute("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = 'candidates' AND column_name = %s
+            """, (col_name,))
+            
+            if not cursor.fetchone():
+                cursor.execute(f"""
+                    ALTER TABLE candidates 
+                    ADD COLUMN {col_name} {col_type}
+                """)
+                conn.commit()
+                migrations_done.append(f"Added '{col_name}' to candidates table")
+        
+        cursor.close()
+        release_connection(conn)
+        
+        if migrations_done:
+            return jsonify({
+                'message': 'Migration completed successfully',
+                'migrations': migrations_done
+            }), 200
+        else:
+            return jsonify({
+                'message': 'Database is already up to date',
+                'migrations': []
+            }), 200
+        
+    except Exception as e:
+        if conn:
+            conn.rollback()
+            release_connection(conn)
+        return jsonify({'error': str(e)}), 500
+
 # ------------------- ANALYZE API -------------------
 @app.route('/api/analyze', methods=['POST'])
 def analyze_resumes():
