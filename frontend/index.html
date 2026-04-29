@@ -21,11 +21,27 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="logo">
-                <i class="fas fa-brain"></i>
-                <h1>Niyati Engine</h1>
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <h1>Niyati Engine</h1>
+                </div>
+                <p class="subtitle">AI-Powered Resume Screening System</p>
             </div>
-            <p class="subtitle">AI-Powered Resume Screening System</p>
+            <div class="user-section" id="userSection" style="display: none;">
+                <button class="btn-refresh" id="refreshBtn" title="Refresh Page">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="btn-settings" id="settingsBtn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <span id="welcomeUser" class="username"></span>
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -132,6 +148,179 @@
                             <canvas id="barChart"></canvas>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <i class="fas fa-brain"></i>
+                    <h3>Niyati Engine</h3>
+                </div>
+                <p class="footer-description">AI-Powered Resume Screening System for smarter hiring decisions</p>
+            
+            </div>
+            
+            <div class="footer-section">
+                <h4><i class="fas fa-users"></i>Team</h4>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-info">
+                            <h5>Gokul Sowri</h5>
+                            <div class="member-contact">
+                                <a href="mailto:gokulsowrigalla@gmail.com"><i class="fas fa-envelope"></i></a>
+                                <a href="https://github.com/gokul3011-c" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                                <a href="https://www.linkedin.com/in/gokulsowrigalla/" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="team-member">
+                        <div class="member-info">
+                            <h5>Abhinav Sai</h5>
+                            <div class="member-contact">
+                                <a href="mailto:ganlaabhinavsai@gmail.com"><i class="fas fa-envelope"></i></a>
+                                <a href="https://github.com/abhinavprog" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                                <a href="https://www.linkedin.com/in/abhinavsaiganla/" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="team-member">
+                        <div class="member-info">
+                            <h5>Mani Vardhan</h5>
+                            <div class="member-contact">
+                                <a href="mailto:manivardhankankanala@gmail.com"><i class="fas fa-envelope"></i></a>
+                                <a href="https://github.com/manivardhan000" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                                <a href="https://www.linkedin.com/in/kankanala-manivardhan-592872302/" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4><i class="fas fa-info-circle"></i> Quick Info</h4>
+                <ul class="footer-links">
+                    <li><i class="fas fa-chevron-right"></i> AI-Powered Screening</li>
+                    <li><i class="fas fa-chevron-right"></i> Multi-Format Support</li>
+                    <li><i class="fas fa-chevron-right"></i> Real-time Analytics</li>
+                    <li><i class="fas fa-chevron-right"></i> Secure & Scalable</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Settings Slide Panel -->
+    <div class="settings-overlay" id="settingsOverlay" style="display: none;"></div>
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            <button class="btn-close-settings" id="closeSettings">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="settings-content">
+            <!-- Screening History Section -->
+            <div class="settings-section">
+                <h3><i class="fas fa-history"></i> Screening History</h3>
+                <div class="history-list" id="historyList">
+                    <p class="loading-text">Loading history...</p>
+                </div>
+            </div>
+
+            <!-- Delete Section -->
+            <div class="settings-section">
+                <h3><i class="fas fa-trash"></i> Manage Screenings</h3>
+                <button class="btn-delete-screenings" id="deleteScreeningsBtn">
+                    <i class="fas fa-trash-alt"></i> Delete Previous Screenings
+                </button>
+            </div>
+
+            <!-- Delete Mode (appears when delete button is clicked) -->
+            <div class="settings-section delete-mode" id="deleteMode" style="display: none;">
+                <h3><i class="fas fa-check-square"></i> Select Screenings to Delete</h3>
+                <div class="delete-list" id="deleteList"></div>
+                <div class="delete-actions">
+                    <button class="btn-cancel-delete" id="cancelDelete">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn-confirm-delete" id="confirmDelete">
+                        <i class="fas fa-trash"></i> Delete Selected
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logout Section -->
+            <div class="settings-section logout-section">
+                <button class="btn-logout-settings" id="logoutSettingsBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Popup Modal -->
+    <div class="profile-overlay" id="profileOverlay" style="display: none;"></div>
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-header">
+            <h2><i class="fas fa-user-circle"></i> User Profile</h2>
+            <div class="profile-header-actions">
+                <button class="btn-edit-profile" id="editProfileBtn" title="Edit Profile">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-close-profile" id="closeProfile">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="profile-content">
+            <div class="profile-avatar-large">
+                <i class="fas fa-user"></i>
+            </div>
+            
+            <!-- View Mode -->
+            <div class="profile-info" id="profileViewMode">
+                <div class="profile-item">
+                    <label><i class="fas fa-user"></i> Name</label>
+                    <span id="profileName">-</span>
+                </div>
+                <div class="profile-item">
+                    <label><i class="fas fa-building"></i> Company</label>
+                    <span id="profileCompany">-</span>
+                </div>
+                <div class="profile-item">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <span id="profileEmail">-</span>
+                </div>
+            </div>
+            
+            <!-- Edit Mode -->
+            <div class="profile-info-edit" id="profileEditMode" style="display: none;">
+                <div class="profile-edit-item">
+                    <label><i class="fas fa-user"></i> Name</label>
+                    <input type="text" id="editName" class="profile-input" placeholder="Enter your name">
+                </div>
+                <div class="profile-edit-item">
+                    <label><i class="fas fa-building"></i> Company</label>
+                    <input type="text" id="editCompany" class="profile-input" placeholder="Enter your company">
+                </div>
+                <div class="profile-edit-item">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="editEmail" class="profile-input" placeholder="Enter your email">
+                </div>
+                <div class="profile-edit-actions">
+                    <button class="btn-cancel-edit" id="cancelEdit">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="btn-save-profile" id="saveProfile">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
                 </div>
             </div>
         </div>

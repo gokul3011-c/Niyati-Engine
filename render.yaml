@@ -1,0 +1,45 @@
+services:
+  # Web Service - Flask Backend
+  - type: web
+    name: niyati-engine
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DB_NAME
+        fromDatabase:
+          name: niyati-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: niyati-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: niyati-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: niyati-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: niyati-db
+          property: port
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: FLASK_DEBUG
+        value: false
+      - key: FLASK_PORT
+        value: 10000
+
+  # PostgreSQL Database
+  - type: pserv
+    name: niyati-db
+    databaseName: niyati_engine
+    user: niyati_user
+    ipAllowList: []
