@@ -1,20 +1,28 @@
 import pdfplumber
-import pytesseract
 from PIL import Image
 from docx import Document
 import os
 import platform
 
-# Set Tesseract path based on operating system
+# Try to import pytesseract, but don't fail if it's not available
 try:
-    if platform.system() == 'Windows':
-        # Windows path
-        pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-    else:
-        # Linux/Mac (Render uses Linux)
-        pytesseract.pytesseract.tesseract_cmd = r"/usr/bin/tesseract"
+    import pytesseract
+    
+    # Set Tesseract path based on operating system
+    try:
+        if platform.system() == 'Windows':
+            # Windows path
+            pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+        else:
+            # Linux/Mac (Render uses Linux)
+            pytesseract.pytesseract.tesseract_cmd = r"/usr/bin/tesseract"
+    except Exception:
+        pass  # Tesseract will use default path
+        
+    TESSERACT_AVAILABLE = True
 except Exception:
-    pass  # Tesseract will use default path
+    TESSERACT_AVAILABLE = False
+    print("⚠️  Tesseract OCR not available. Image-based PDFs will be skipped.")
 
 import joblib
 
@@ -588,13 +596,18 @@ def extract_text_from_pdf(file):
             if content:
                 text += content + "\n"
             else:
-                image = page.to_image().original
-
-                # Improve OCR quality
-                image = image.convert('L')  # grayscale
-
-                ocr_text = pytesseract.image_to_string(image)
-                text += ocr_text + "\n"
+                # Try OCR if Tesseract is available
+                if TESSERACT_AVAILABLE:
+                    try:
+                        image = page.to_image().original
+                        # Improve OCR quality
+                        image = image.convert('L')  # grayscale
+                        ocr_text = pytesseract.image_to_string(image)
+                        text += ocr_text + "\n"
+                    except Exception as e:
+                        print(f"⚠️  OCR failed for page: {e}")
+                else:
+                    print("⚠️  Skipping image-based page (Tesseract not available)")
 
     return text
 
@@ -610,9 +623,17 @@ def extract_text_from_docx(file):
     return text
 
 def extract_text_from_image(file):
-    image = Image.open(file)
-    text = pytesseract.image_to_string(image)
-    return text
+    if not TESSERACT_AVAILABLE:
+        print("⚠️  Cannot extract text from image (Tesseract not available)")
+        return ""
+    
+    try:
+        image = Image.open(file)
+        text = pytesseract.image_to_string(image)
+        return text
+    except Exception as e:
+        print(f"⚠️  Image extraction failed: {e}")
+        return ""
 
 def get_resume_text(file):
     # Handle both Streamlit and Flask file objects
