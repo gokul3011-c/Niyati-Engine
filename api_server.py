@@ -25,6 +25,101 @@ with app.app_context():
     try:
         init_db()
         print("✅ Database initialized")
+        
+        # Run comprehensive migration on startup
+        print("🔍 Running database migration...")
+        conn = None
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            
+            # Create analysis_sessions table if not exists
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS analysis_sessions (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    job_description TEXT NOT NULL,
+                    cutoff_score DECIMAL(5, 2) NOT NULL,
+                    total_candidates INTEGER DEFAULT 0,
+                    accepted_count INTEGER DEFAULT 0,
+                    rejected_count INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            conn.commit()
+            print("✅ analysis_sessions table ready")
+            
+            # Add missing columns to users table
+            user_columns = [
+                ('company', 'VARCHAR(200)'),
+                ('email', 'VARCHAR(150)'),
+                ('last_login', 'TIMESTAMP'),
+                ('is_active', 'BOOLEAN DEFAULT TRUE')
+            ]
+            
+            for col_name, col_type in user_columns:
+                cursor.execute("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = 'users' AND column_name = %s
+                """, (col_name,))
+                
+                if not cursor.fetchone():
+                    cursor.execute(f"""
+                        ALTER TABLE users 
+                        ADD COLUMN {col_name} {col_type}
+                    """)
+                    conn.commit()
+                    print(f"✅ Added '{col_name}' to users table")
+            
+            # Add missing columns to candidates table
+            cursor.execute("""
+                SELECT column_name 
+                FROM information_schema.columns 
+                WHERE table_name = 'candidates' AND column_name = 'session_id'
+            """)
+            
+            if not cursor.fetchone():
+                cursor.execute("""
+                    ALTER TABLE candidates 
+                    ADD COLUMN session_id INTEGER REFERENCES analysis_sessions(id)
+                """)
+                conn.commit()
+                print("✅ Added 'session_id' to candidates table")
+            
+            candidate_columns = [
+                ('matched_skills', 'TEXT[]'),
+                ('missing_skills', 'TEXT[]'),
+                ('job_description', 'TEXT'),
+                ('cutoff_score', 'DECIMAL(5, 2)'),
+                ('status', 'VARCHAR(20)')
+            ]
+            
+            for col_name, col_type in candidate_columns:
+                cursor.execute("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = 'candidates' AND column_name = %s
+                """, (col_name,))
+                
+                if not cursor.fetchone():
+                    cursor.execute(f"""
+                        ALTER TABLE candidates 
+                        ADD COLUMN {col_name} {col_type}
+                    """)
+                    conn.commit()
+                    print(f"✅ Added '{col_name}' to candidates table")
+            
+            cursor.close()
+            release_connection(conn)
+            print("✅ Database migration completed!")
+            
+        except Exception as e:
+            print(f"⚠️  Migration error: {e}")
+            if conn:
+                conn.rollback()
+                release_connection(conn)
+                
     except Exception as e:
         print(f"⚠️  Database initialization skipped: {e}")
 
