@@ -2,7 +2,19 @@ import pdfplumber
 import pytesseract
 from PIL import Image
 from docx import Document
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+import os
+import platform
+
+# Set Tesseract path based on operating system
+try:
+    if platform.system() == 'Windows':
+        # Windows path
+        pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    else:
+        # Linux/Mac (Render uses Linux)
+        pytesseract.pytesseract.tesseract_cmd = r"/usr/bin/tesseract"
+except Exception:
+    pass  # Tesseract will use default path
 
 import joblib
 
