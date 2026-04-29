@@ -38,7 +38,7 @@ services:
         value: 10000
 
   # PostgreSQL Database
-  - type: pserv
+  - type: postgres
     name: niyati-db
     databaseName: Niyati Engine
     user: gokul3011-c
