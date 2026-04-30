@@ -123,6 +123,51 @@ with app.app_context():
     except Exception as e:
         print(f"⚠️  Database initialization skipped: {e}")
 
+# ------------------- CHECK USERS (DEBUG) -------------------
+@app.route('/api/debug/users', methods=['GET'])
+def check_users():
+    """Debug endpoint to list all users in the database"""
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Get all users (without passwords for security)
+        cursor.execute("""
+            SELECT id, username, company, email, created_at, is_active
+            FROM users
+            ORDER BY created_at DESC
+        """)
+        
+        users = cursor.fetchall()
+        users_list = []
+        
+        for user in users:
+            users_list.append({
+                'id': user[0],
+                'username': user[1],
+                'company': user[2],
+                'email': user[3],
+                'created_at': user[4].isoformat() if user[4] else None,
+                'is_active': user[5]
+            })
+        
+        cursor.close()
+        release_connection(conn)
+        
+        return jsonify({
+            'total_users': len(users_list),
+            'users': users_list
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Debug Error: {e}")
+        import traceback
+        traceback.print_exc()
+        if conn:
+            release_connection(conn)
+        return jsonify({'error': str(e)}), 500
+
 # ------------------- ANALYZE API -------------------
 @app.route('/api/analyze', methods=['POST'])
 def analyze_resumes():
