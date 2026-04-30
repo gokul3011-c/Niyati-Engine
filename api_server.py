@@ -240,6 +240,8 @@ def signup():
         password = data.get("password")
         email = data.get("email", "")
 
+        print(f"📝 Signup attempt - Username: {username}, Email: {email}, Company: {company}")
+
         if not username or not password:
             return jsonify({"error": "Username and password are required"}), 400
 
@@ -254,16 +256,20 @@ def signup():
         if cursor.fetchone():
             cursor.close()
             release_connection(conn)
+            print(f"⚠️  Username already exists: {username}")
             return jsonify({"error": "Username already exists"}), 409
 
+        print(f"✅ Inserting new user into database...")
         cursor.execute(
             "INSERT INTO users (company, username, password, email) VALUES (%s, %s, %s, %s) RETURNING id",
             (company if company else None, username, hashed_password, email if email else None)
         )
 
         user_id = cursor.fetchone()[0]
-
         conn.commit()
+        
+        print(f"✅ User created successfully! ID: {user_id}, Username: {username}")
+        
         cursor.close()
         release_connection(conn)
 
@@ -275,6 +281,9 @@ def signup():
         }), 201
 
     except Exception as e:
+        print(f"❌ Signup Error: {e}")
+        import traceback
+        traceback.print_exc()
         if conn:
             conn.rollback()
             release_connection(conn)
@@ -291,6 +300,8 @@ def login():
         username = data.get("username")
         password = data.get("password")
 
+        print(f"🔐 Login attempt - Username: {username}")
+
         if not username or not password:
             return jsonify({"error": "Username and password are required"}), 400
 
@@ -306,6 +317,7 @@ def login():
 
         if user:
             user_id, stored_password = user
+            print(f"✅ User found in database - ID: {user_id}")
             
             # Verify password (supports both hashed and plain text for backward compatibility)
             password_valid = False
@@ -331,6 +343,8 @@ def login():
                 )
                 user_data = cursor.fetchone()
                 
+                print(f"✅ Login successful for user: {username}")
+                
                 cursor.close()
                 release_connection(conn)
                 
@@ -342,15 +356,20 @@ def login():
                     "email": user_data[2] or ""
                 }), 200
             else:
+                print(f"❌ Invalid password for user: {username}")
                 cursor.close()
                 release_connection(conn)
                 return jsonify({"error": "Invalid credentials"}), 401
         else:
+            print(f"❌ User not found in database: {username}")
             cursor.close()
             release_connection(conn)
             return jsonify({"error": "Invalid credentials"}), 401
 
     except Exception as e:
+        print(f"❌ Login Error: {e}")
+        import traceback
+        traceback.print_exc()
         if conn:
             conn.rollback()
             release_connection(conn)
